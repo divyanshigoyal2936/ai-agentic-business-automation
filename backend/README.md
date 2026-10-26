@@ -127,6 +127,10 @@ python run_eval.py
 Prints a pass/fail report and an accuracy percentage for the
 orchestrator's category-routing.
 
+### Production deployment
+- The root `render.yaml` defines the FastAPI service for Render. Add `MONGO_URI` and `GROQ_API_KEY` in Render's environment settings; Render generates `SECRET_KEY`. Set `FRONTEND_ORIGINS` to the deployed frontend origin.
+- Deploy the `frontend` directory to Vercel and set `NEXT_PUBLIC_API_URL` to the deployed backend URL. The backend CORS origin must match the Vercel URL.
+
 ## Test Users
 
 | Email | Password | Role |

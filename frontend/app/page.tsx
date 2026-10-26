@@ -7,6 +7,11 @@ type ChatTurn = {
   content: string;
 };
 
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000").replace(
+  /\/+$/,
+  "",
+);
+
 export default function Home() {
   const [token, setToken] = useState("");
   const [role, setRole] = useState("");
@@ -29,7 +34,7 @@ export default function Home() {
     setLoginError("");
     setLoggingIn(true);
     try {
-      const res = await fetch("http://127.0.0.1:8000/login", {
+      const res = await fetch(`${API_BASE_URL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -55,7 +60,7 @@ export default function Home() {
     setMessage("");
     setSending(true);
     try {
-      const res = await fetch("http://127.0.0.1:8000/chat", {
+      const res = await fetch(`${API_BASE_URL}/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

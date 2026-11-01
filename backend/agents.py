@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from tools.customer_tools import find_customer_by_email,find_customer_by_id,get_all_customers
 from tools.policy_tools import search_policies
 from tools.order_tools import check_refund_eligibility,process_refund
-from core.database import audit_logs_collection
+from core.database import audit_logs_collection,pending_approvals_collection
 
 load_dotenv()
 MODEL="openai/gpt-oss-120b"
@@ -26,14 +26,15 @@ def run_agent(client,tools_schema,message,role,email):
         args=json.loads(call.function.arguments)
         approved=None
         if name in RISKY:
-            if role!="manager":
-                result={"error":"Permission denied: only managers can perform this action"};approved=False
+            # Risky action is NOT executed here. We save a pending request;
+            # a manager approves/rejects it later via /approvals endpoints.
+            order_id=args.get("order_id")
+            existing=pending_approvals_collection.find_one({"order_id":order_id,"status":"pending"})
+            if existing:
+                result={"status":"pending_approval","message":"A refund request for this order is already waiting for manager approval"}
             else:
-                print(f"\nAI wants to call: {name}({args})")
-                if input("Approve this action? (yes/no): ").lower()!="yes":
-                    result={"error":"Action was not approved by human reviewer"};approved=False
-                else:
-                    result=TOOLS[name](**args);approved=True
+                pending_approvals_collection.insert_one({"tool":name,"order_id":order_id,"requested_by":email,"requested_role":role,"status":"pending","created_at":datetime.datetime.now()})
+                result={"status":"pending_approval","message":"Refund request sent to a manager for approval"}
         elif name=="get_all_customers":result=TOOLS[name]()
         else:result=TOOLS[name](**args)
         log_action(email,role,name,args,result,approved)

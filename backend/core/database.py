@@ -13,3 +13,6 @@ orders_collection = db["orders"]
 
 users_collection = db["users"]
 audit_logs_collection = db["audit_logs"]
+
+pending_approvals_collection = db["pending_approvals"]
+

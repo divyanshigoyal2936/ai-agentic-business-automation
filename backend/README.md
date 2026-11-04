@@ -1,5 +1,42 @@
 # AI Agentic Business Automation Platform
 
+A multi-agent AI platform that automates business support tasks (customer lookup, policy Q&A, refunds) with tool-calling, role-based access and a human-in-the-loop approval workflow.
+
+## Live Demo
+
+- **Web App:** https://ai-agentic-business-automation-ukb4.vercel.app
+- **API Docs (Swagger):** https://ai-agentic-business-automation-api.onrender.com/docs
+
+> The backend runs on a free tier, so the first request after inactivity can take around 1 minute to wake up.
+
+### Demo logins
+
+| Role | Email | Password |
+|---|---|---|
+| Manager | manager@company.com | manager123 |
+| Support Agent | agent@company.com | agent123 |
+
+## Features
+
+- **Multi-agent routing:** an LLM router sends each request to a customer, policy (RAG) or refund agent.
+- **Tool-calling:** agents call real tools backed by MongoDB (customers, orders, policies).
+- **Human-in-the-loop approvals:** refund requests are saved as pending; only a manager can approve or reject them. Status changes are atomic, so a refund can never be processed twice.
+- **Auth and roles:** JWT login with manager and support-agent roles.
+- **Audit logs:** every AI action and approval decision is recorded.
+
+## How the approval flow works
+
+1. A user asks the assistant to refund an order.
+2. The agent checks eligibility and creates a `pending` approval request (nothing is refunded yet).
+3. A manager opens `GET /approvals`, then calls `POST /approvals/{id}/approve` or `/reject` (available in the Swagger docs above).
+4. Only on approval is the refund executed and written to the audit log.
+
+## Tech Stack
+
+FastAPI · Groq LLM · MongoDB Atlas · fastembed (ONNX embeddings, semantic search) · Next.js · Docker · Render · Vercel
+
+# AI Agentic Business Automation Platform
+
 AI-powered customer support aur refund-processing platform. Multi-agent
 architecture, RAG-based policy search, human-in-the-loop approvals,
 role-based access control, aur audit logging ke saath banaya gaya hai —

@@ -1,12 +1,10 @@
-pydantic-settings 
 pymongo
-anthropic
 fastapi
 uvicorn
 python-dotenv
 pydantic
 groq
-langgraph
-sentence-transformers
+fastembed
+numpy
 bcrypt
 pyjwt
